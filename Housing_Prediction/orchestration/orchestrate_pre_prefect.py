@@ -10,8 +10,12 @@ from sklearn.metrics import mean_squared_error
 import xgboost as xgb
 from prefect import flow, task
 
+df = pd.read_csv("C:/Users/Victoria/gt/MLOp/Housing_Prediction/Training.csv")
+df_train = pd.read_csv("C:/Users/Victoria/gt/MLOp/Housing_Prediction/Training.csv")
+df_val = pd.read_csv("C:/Users/Victoria/gt/MLOp/Housing_Prediction/Validation.csv")
 
-def read_dat(filename: str) -> pd.DataFrame:
+
+def read_data(filename: str) -> pd.DataFrame:
     df = pd.read_csv(filename)
     df = df.drop("Id", axis=1)
     df = df.drop(columns=["Alley", "PoolQC", "Fence", "MiscFeature"])
@@ -69,37 +73,62 @@ def train_best_model(
     dv: sklearn.feature_extraction.DictVectorizer,
 ) -> None:
     """train a model with best hyperparams and write everything out"""
-
     with mlflow.start_run():
         train = xgb.DMatrix(X_train, label=y_train)
         valid = xgb.DMatrix(X_val, label=y_val)
 
         best_params = {
-            "learning_rate": 0.06285818871453905,
-            "max_depth": 78,
-            "min_child_weight": 16.997027875383516,
+            "learning_rate": 0.06817254433679483,
+            "max_depth": 4,
+            "min_child_weight": 5.342622580585712,
             "objective": "reg:linear",
-            "reg_alpha": 0.012917821011080867,
-            "reg_lambda": 0.006580801272479912,
+            "reg_alpha": 0.03767824771170366,
+            "reg_lambda": 0.11142683044900038,
             "seed": 42,
         }
+        mlflow.log_params(best_params)
 
+        booster = xgb.train(
+            params=best_params,
+            dtrain=train,
+            num_boost_round=1000,
+            evals=[(valid, "validation")],
+            early_stopping_rounds=50,
+        )
 
-mlflow.xgboost.autolog()
+        y_pred = booster.predict(valid)
+        rmse = mean_squared_error(y_val, y_pred, squared=False)
+        mlflow.log_metric("rmse", rmse)
 
-booster = xgb.train(
-    params=best_params,
-    dtrain=train,
-    num_boost_round=1000,
-    evals=[(valid, "validation")],
-    early_stopping_rounds=50,
-)
-y_pred = booster.predict(valid)
-rmse = mean_squared_error(y_val, y_pred, squared=False)
-mlflow.log_metric("rmse", rmse)
-pathlib.Path("models").mkdir(exist_ok=True)
-with open("models/preprocessor.b", "wb") as f_out:
-    pickle.dump(dv, f_out)
-    mlflow.log_artifact("models/preprocessor.b", artifact_path="preprocessor")
-    mlflow.xgboost.log_model(booster, artifact_path="models_mlflow")
+        pathlib.Path("models").mkdir(exist_ok=True)
+        with open("models/preprocessor.b", "wb") as f_out:
+            pickle.dump(dv, f_out)
+        mlflow.log_artifact("models/preprocessor.b", artifact_path="preprocessor")
+
+        mlflow.xgboost.log_model(booster, artifact_path="models_mlflow")
     return None
+
+
+def main_flow(
+    train_path: str = "C:/Users/Victoria/gt/MLOp/Housing_Prediction/Training.csv",
+    val_path: str = "C:/Users/Victoria/gt/MLOp/Housing_Prediction/Validation.csv",
+) -> None:
+    """The main training pipeline"""
+
+    # MLflow settings
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    mlflow.set_experiment("First Prediction")
+
+    # Load
+    df_train = read_data(train_path)
+    df_val = read_data(val_path)
+
+    # Transform
+    X_train, X_val, y_train, y_val, dv = add_features(df_train, df_val)
+
+    # Train
+    train_best_model(X_train, X_val, y_train, y_val, dv)
+
+
+if __name__ == "__main__":
+    main_flow()
