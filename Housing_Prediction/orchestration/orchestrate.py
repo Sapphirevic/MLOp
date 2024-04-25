@@ -10,7 +10,9 @@ import mlflow
 import xgboost as xgb
 from prefect import flow, task
 
-
+df = pd.read_csv("C:/Users/2024/HOUSE/MLOp/Housing_Prediction/Training.csv")
+df_train = pd.read_csv("C:/Users/2024/HOUSE/MLOp/Housing_Prediction/Training.csv")
+df_val = pd.read_csv("C:/Users/2024/HOUSE/MLOp/Housing_Prediction/Validation.csv")
 @task(retries=3, retry_delay_seconds=2)
 def read_data(filename: str) -> pd.DataFrame:
     """Read data into DataFrame"""
@@ -112,8 +114,8 @@ def train_best_model(
 
 @flow
 def main_flow(
-    train_path: str = "C:/Users/Victoria/gt/MLOp/Housing_Prediction/Training.csv",
-    val_path: str = "C:/Users/Victoria/gt/MLOp/Housing_Prediction/Validation.csv",
+    train_path: str = "C:/Users/2024/HOUSE/MLOp/Housing_Prediction/Training.csv",
+    val_path: str = "C:/Users/2024/HOUSE/MLOp/Housing_Prediction/Validation.csv",
 ) -> None:
     """The main training pipeline"""
 

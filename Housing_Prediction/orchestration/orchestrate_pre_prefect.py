@@ -10,10 +10,9 @@ from sklearn.metrics import mean_squared_error
 import xgboost as xgb
 from prefect import flow, task
 
-df = pd.read_csv("C:/Users/Victoria/gt/MLOp/Housing_Prediction/Training.csv")
-df_train = pd.read_csv("C:/Users/Victoria/gt/MLOp/Housing_Prediction/Training.csv")
-df_val = pd.read_csv("C:/Users/Victoria/gt/MLOp/Housing_Prediction/Validation.csv")
-
+df = pd.read_csv("C:/Users/2024/HOUSE/MLOp/Housing_Prediction/Training.csv")
+df_train = pd.read_csv("C:/Users/2024/HOUSE/MLOp/Housing_Prediction/Training.csv")
+df_val = pd.read_csv("C:/Users/2024/HOUSE/MLOp/Housing_Prediction/Validation.csv")
 
 def read_data(filename: str) -> pd.DataFrame:
     df = pd.read_csv(filename)
@@ -29,7 +28,9 @@ def read_data(filename: str) -> pd.DataFrame:
     return df
 
 
-def add_features(df_train: pd.DataFrame, df_val: pd.DataFrame) -> tuple(
+def add_features(
+        df_train: pd.DataFrame, df_val: pd.DataFrame
+) -> tuple(
     [
         scipy.sparse._csr.csr_matrix,
         scipy.sparse._csr.csr_matrix,
@@ -110,8 +111,8 @@ def train_best_model(
 
 
 def main_flow(
-    train_path: str = "C:/Users/Victoria/gt/MLOp/Housing_Prediction/Training.csv",
-    val_path: str = "C:/Users/Victoria/gt/MLOp/Housing_Prediction/Validation.csv",
+    train_path: str = "C:/Users/2024/HOUSE/MLOp/Housing_Prediction/Training.csv",
+    val_path: str = "C:/Users/2024/HOUSE/MLOp/Housing_Prediction/Validation.csv",
 ) -> None:
     """The main training pipeline"""
 
