@@ -10,8 +10,12 @@ seaborn = "*"
 scikit-learn = "*"
 pandas = "*"
 numpy = "*"
+requests = "*"
+gunicorn = "*"
+waitress = "*"
 
 [dev-packages]
+requests = "*"
 
 [requires]
 python_version = "3.11"

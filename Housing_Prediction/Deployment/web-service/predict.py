@@ -19,7 +19,7 @@ def prepare_features(price):
 def predict(features):
     X = dv.transform(features)
     preds = model.predict(X)
-    return preds
+    return float(preds[0])
 
 
 app = Flask("Pricing-Prediction")
@@ -37,4 +37,4 @@ def predict_endpoint():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=9696)
+    app.run(debug=True, host="0.0.0.0", port=8080)
