@@ -1,7 +1,9 @@
-flask
+Flask
 matplotlib
 seaborn
 scikit-learn 
 pandas
 numpy
 requests
+gunicorn
+waitress
