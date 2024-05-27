@@ -1,11 +1,18 @@
-web-service/__pycache__
-web-service/myenv
-web-service/myenvn
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Environments
+.env
+.venv
+myenv/
+myenvn/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
 # C extensions
 *.so
